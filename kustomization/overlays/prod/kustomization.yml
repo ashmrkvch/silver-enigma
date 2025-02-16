@@ -1,0 +1,6 @@
+bases:
+  - ../base
+
+patches:
+  - path: deployment-patch.yml
+  - path: ingress-patch.yml

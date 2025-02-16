@@ -1,0 +1,32 @@
+version: '3'
+
+vars:
+  ENV_APP_NETWORK: home-test-network
+  FRONTEND_APP_IMAGE: docker.io/gigpops/fe-applet
+  BACKEND_APP_IMAGE: docker.io/gigpops/be-applet
+  REACT_APP_BACKEND_API_BASE_URL: 'http://localhost:8000'
+  BE_DATABASE_URL: 'postgresql://postgres:mysecretpassword@db/postgres'
+
+tasks:
+  default:
+    cmds:
+      - task: start-env
+
+  start-env:
+    cmds:
+      - podman network create {{.ENV_APP_NETWORK}}
+      - podman run --name fe-app --network {{.ENV_APP_NETWORK}} --publish 3000:3000 --env REACT_APP_BACKEND_API_BASE_URL='{{.REACT_APP_BACKEND_API_BASE_URL}}' -it -d {{.FRONTEND_APP_IMAGE}} npm start
+      - podman run --name be-app --network {{.ENV_APP_NETWORK}} --publish 8000:8000 --env DATABASE_URL='{{.BE_DATABASE_URL}}' -d {{.BACKEND_APP_IMAGE}}
+      - podman run --name db --network {{.ENV_APP_NETWORK}} -it --publish 5432:5432 --env POSTGRES_PASSWORD='mysecretpassword' -d docker.io/library/postgres:latest
+    status:
+      - podman network ls | grep {{.ENV_APP_NETWORK}}
+      - podman ps | grep fe-app
+      - podman ps | grep be-app
+      - podman ps | grep db
+
+  cleanup-env:
+    cmds:
+      - podman rm -f fe-app
+      - podman rm -f be-app
+      - podman rm -f db 
+      - podman network rm -f {{.ENV_APP_NETWORK}}

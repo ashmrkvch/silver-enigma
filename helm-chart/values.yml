@@ -1,0 +1,8 @@
+frontend:
+  image: docker.io/gigpops/fe-applet
+backend:
+  image: docker.io/gigpops/be-applet
+  databaseUrl: "postgresql://postgres:mysecretpassword@postgres/postgres"
+postgres:
+  password: "mysecretpassword"
+  storage: 1Gi
