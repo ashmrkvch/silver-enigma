@@ -99,7 +99,8 @@ kubectl delete -k kustomize/overlays/dev
 
 - **Issue**: The frontend container runs in development mode and does not serve built static files.
 - **Current State**: The React app is served using `serve -s build`, but the build step is missing.
-- **Workaround**: Add the `build` step in Dockerfile or entrypoint script inside the container.
+- **Workaround**: Add the `build` step in Dockerfile or entrypoint script inside the container
+- **Workaround**: Use an init-container to build the frontend before running the main container, or mount a prebuilt build/ directory using a ConfigMap/Volume.
 
 ## Notes
 
